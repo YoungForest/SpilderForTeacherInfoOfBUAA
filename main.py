@@ -85,10 +85,7 @@ def getATeacherInfo(card_div):
         office = details[4].find('span', attrs={'class': 'card_detail_span'}).string
         match_string = r'<p id="introduceP2" style="text-indent: 2em;">.*?r</p>'
         match = re.search(match_string, homepage)
-        if match:
-            introduce = BeautifulSoup(match.group(0), "html.parser").p.string
-        else:
-            introduce = ''
+        introduce = BeautifulSoup(match.group(0), "html.parser").p.string
         info['zip_code'] = zip_code
         info['office'] = office
         info['introduce'] = introduce
