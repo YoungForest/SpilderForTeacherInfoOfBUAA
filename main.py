@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 import traceback
 import re
+import sys
 
 def getHTMLText(url, param=None):
     """Get HTML text from url/param
@@ -55,7 +56,7 @@ def getATeacherInfo(card_div):
         divs = killNewlineInList(killNewlineInList(card_divl.contents)[1].div.contents)
         # deal with 1st div
         spans1 = killNewlineInList(divs[0].contents)
-        onclick = spans1[0].attrs['onclick'][20:56] # get the numbers series"toCardDetailAction('652c28c1-8cb2-44cf-92e2-fa841a9e2c1e');"
+        onclick = spans1[0].attrs['onclick'].split('\'')[1] # get the numbers series"toCardDetailAction('652c28c1-8cb2-44cf-92e2-fa841a9e2c1e');"
         name = spans1[0].string
         jobtitle = spans1[1].string
         #deal with 2nd div
@@ -93,6 +94,7 @@ def getATeacherInfo(card_div):
         print(info)
     except:
         traceback.print_exc()
+        sys.exit()
     
     return info
     
