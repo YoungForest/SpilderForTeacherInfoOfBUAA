@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import traceback
 import re
 import sys
+import csv
 
 def getHTMLText(url, param=None):
     """Get HTML text from url/param
@@ -52,7 +53,7 @@ def getATeacherInfo(card_div):
     """
     try:
         card_divl = card_div.div    # only one div here because the topest isnot docment
-        info = []
+        info = {}
         divs = killNewlineInList(killNewlineInList(card_divl.contents)[1].div.contents)
         # deal with 1st div
         spans1 = killNewlineInList(divs[0].contents)
@@ -70,28 +71,28 @@ def getATeacherInfo(card_div):
         email = killNewlineInList(divs[3].contents)[1].string
         # 5th div
         homepage = killNewlineInList(divs[4].contents)[1].string
-        info.append(name)
-        info.append(jobtitle)
-        info.append(title)
-        info.append(phone_number)
-        info.append(email)
-        info.append(homepage)
+        info['name'] = name
+        info['job_title'] = jobtitle
+        info['title'] = title
+        info['phone_number'] = phone_number
+        info['email'] = email
+        info['homepage'] = homepage
         url = "http://scse.buaa.edu.cn/buaa-css-web/toCardDetailAction.action?firstSelId=CARD_TMPL_OF_FIRST_NAVI_CN&secondSelId=CARD_TMPL_OF_ALL_TEACHER_CN&thirdSelId=&cardId=%s&language=0&curSelectNavId=CARD_TMPL_OF_ALL_TEACHER_CN" %(onclick)
         homepage = getHTMLText(url)
         soup = BeautifulSoup(homepage, "html.parser")
         details = soup.find_all('div', attrs={'class': 'card_detail'})
         zip_code = details[3].find('span', attrs={'class': 'card_detail_span'}).string
         office = details[4].find('span', attrs={'class': 'card_detail_span'}).string
-        match_string = r'<p id="introduceP2" style="text-indent: 2em;">.*?</p>'
+        match_string = r'<p id="introduceP2" style="text-indent: 2em;">.*?r</p>'
         match = re.search(match_string, homepage)
         if match:
             introduce = BeautifulSoup(match.group(0), "html.parser").p.string
         else:
             introduce = ''
-        info.append(zip_code)
-        info.append(office)
-        info.append(introduce)
-        print(info)
+        info['zip_code'] = zip_code
+        info['office'] = office
+        info['introduce'] = introduce
+        # print(info)
     except:
         traceback.print_exc()
         sys.exit()
@@ -118,7 +119,14 @@ def getTeachersInfo(url, infoList):
 def saveToCSV(infoList):
     """Save the information list to csv file
     """
-    print(infoList)
+    head = ['name', 'job_title', 'title', 'phone_number', 'email', 
+              'homepage', 'zip_code', 'office', 'introduce']
+    ofile = open('teachers-info.csv', "w")
+    writer = csv.DictWriter(ofile, fieldnames=head, dialect='unix')
+    writer.writeheader()
+    writer.writerows(infoList)
+    ofile.close()
+    # print(infoList)
 
 if __name__ == "__main__":
     url = "http://scse.buaa.edu.cn/buaa-css-web/navigationTemplateListAction.action?firstSelId=CARD_TMPL_OF_FIRST_NAVI_CN&updateSelFirstNav=true&language=0"
