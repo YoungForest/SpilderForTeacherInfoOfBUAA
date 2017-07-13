@@ -87,6 +87,8 @@ def getATeacherInfo(card_div):
         # Some teacher do not have a introduce even.
         if introduceP2:
             introduce = introduceP2.string
+            if not introduce:
+                introduce = introduceP2.text
         else:
             introduce = 'nothing'
         info['zip_code'] = zip_code
