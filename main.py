@@ -83,16 +83,20 @@ def getATeacherInfo(card_div):
         details = soup.find_all('div', attrs={'class': 'card_detail'})
         zip_code = details[3].find('span', attrs={'class': 'card_detail_span'}).string
         office = details[4].find('span', attrs={'class': 'card_detail_span'}).string
-        match_string = r'<p id="introduceP2" style="text-indent: 2em;">.*?r</p>'
-        match = re.search(match_string, homepage)
-        introduce = BeautifulSoup(match.group(0), "html.parser").p.string
+        introduceP2 = soup.find('p', id='introduceP2')
+        # Some teacher do not have a introduce even.
+        if introduceP2:
+            introduce = introduceP2.string
+        else:
+            introduce = 'nothing'
         info['zip_code'] = zip_code
         info['office'] = office
         info['introduce'] = introduce
         # print(info)
+        # sys.exit()
     except:
         traceback.print_exc()
-        sys.exit()
+        # sys.exit()
     
     return info
     
@@ -121,7 +125,13 @@ def saveToCSV(infoList):
     ofile = open('teachers-info.csv', "w")
     writer = csv.DictWriter(ofile, fieldnames=head, dialect='unix')
     writer.writeheader()
-    writer.writerows(infoList)
+    
+    for row in infoList:
+        try:
+            writer.writerow(row)
+        except:
+            print(row)
+            traceback.print_exc()
     ofile.close()
     # print(infoList)
 
